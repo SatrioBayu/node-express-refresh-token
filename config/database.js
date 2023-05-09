@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+const { PGDATABASE, PGHOST, PGPASSWORD, PGPORT, PGUSER } = process.env;
+
 module.exports = {
   development: {
     username: "postgres",
@@ -16,10 +18,10 @@ module.exports = {
     dialect: "mysql",
   },
   production: {
-    username: "root",
-    password: null,
-    database: "database_production",
-    host: "127.0.0.1",
-    dialect: "mysql",
+    username: PGUSER,
+    password: PGPASSWORD,
+    database: PGDATABASE,
+    host: PGHOST,
+    dialect: "postgres",
   },
 };
