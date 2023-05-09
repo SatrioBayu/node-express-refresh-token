@@ -190,7 +190,7 @@ const handleRefreshToken = async (req, res) => {
 };
 
 const generateAccessToken = (user) => {
-  return jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15s" });
+  return jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30m" });
 };
 
 module.exports = { handleRegister, handleLogin, handleAuth, handleWhoAmI, handleRefreshToken, handleLogout };
