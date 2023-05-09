@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       username: DataTypes.STRING,
       password: DataTypes.STRING,
+      refreshToken: DataTypes.STRING,
     },
     {
       sequelize,

@@ -1,6 +1,7 @@
 const { User } = require("../models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const handleAuth = async (req, res, next) => {
   try {
@@ -101,10 +102,14 @@ const handleLogin = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET);
+
+    if (user.refreshToken == null) await user.update({ refreshToken });
 
     res.status(200).send({
-      token,
+      accessToken,
+      refreshToken,
     });
   } catch (error) {
     console.log(error.message);
@@ -128,4 +133,34 @@ const handleWhoAmI = async (req, res) => {
   }
 };
 
-module.exports = { handleRegister, handleLogin, handleAuth, handleWhoAmI };
+const handleRefreshToken = async (req, res) => {
+  try {
+    const refreshToken = req.body.token;
+    if (refreshToken == null) return res.sendStatus(401);
+
+    // Cek user ada atau tidak
+    const user = await User.findOne({
+      where: {
+        refreshToken,
+      },
+    });
+
+    if (!user) return res.sendStatus(403);
+
+    jwt.verify(user.refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
+      if (err) return res.sendStatus(403);
+      const accessToken = generateAccessToken(data);
+      res.status(200).send({ accessToken });
+    });
+  } catch (error) {
+    res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
+const generateAccessToken = (user) => {
+  return jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15s" });
+};
+
+module.exports = { handleRegister, handleLogin, handleAuth, handleWhoAmI, handleRefreshToken };

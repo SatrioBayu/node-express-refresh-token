@@ -12,5 +12,6 @@ router.get("/", (req, res) => {
 router.post("/register", authenticationController.handleRegister);
 router.post("/login", authenticationController.handleLogin);
 router.get("/me", authenticationController.handleAuth, authenticationController.handleWhoAmI);
+router.post("/refresh", authenticationController.handleRefreshToken);
 
 module.exports = router;
