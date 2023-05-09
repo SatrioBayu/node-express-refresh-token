@@ -12,7 +12,7 @@ const handleAuth = async (req, res, next) => {
       });
     }
     const token = auth.split(" ")[1];
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     const user = await User.findByPk(decodedToken.id);
     if (!user) {
       return res.status(401).send({
