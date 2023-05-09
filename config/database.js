@@ -22,6 +22,7 @@ module.exports = {
     password: PGPASSWORD,
     database: PGDATABASE,
     host: PGHOST,
+    port: PGPORT,
     dialect: "postgres",
   },
 };
