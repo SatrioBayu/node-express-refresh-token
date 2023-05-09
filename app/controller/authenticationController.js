@@ -103,9 +103,11 @@ const handleLogin = async (req, res) => {
     }
 
     const accessToken = generateAccessToken(user);
-    const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET);
-
-    if (user.refreshToken == null) await user.update({ refreshToken });
+    let refreshToken;
+    if (user.refreshToken == null) {
+      refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET);
+      await user.update({ refreshToken });
+    }
 
     res.status(200).send({
       accessToken,
@@ -113,6 +115,34 @@ const handleLogin = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
+    res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
+const handleLogout = async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    const user = await User.findOne({
+      where: {
+        username,
+      },
+    });
+
+    if (!user)
+      return res.status(404).send({
+        message: "User not found",
+      });
+
+    await user.update({
+      refreshToken: null,
+    });
+    res.status(200).send({
+      message: "Berhasil logout",
+    });
+  } catch (error) {
     res.status(500).send({
       message: error.message,
     });
@@ -163,4 +193,4 @@ const generateAccessToken = (user) => {
   return jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15s" });
 };
 
-module.exports = { handleRegister, handleLogin, handleAuth, handleWhoAmI, handleRefreshToken };
+module.exports = { handleRegister, handleLogin, handleAuth, handleWhoAmI, handleRefreshToken, handleLogout };
