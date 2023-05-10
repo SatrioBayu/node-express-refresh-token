@@ -38,6 +38,10 @@ POST http://localhost:8000/refresh
 ```https
 POST http://localhost:8000/logout
 ```
+**API Docs Live**
+```https
+http://localhost:8000/api-docs/
+```
 
 ## Run Locally
 
