@@ -93,12 +93,6 @@ Atau juga bisa dilakukan set manual pada file config/database.js
 - [PostgreSQL](https://www.postgresql.org/)
 - [JWT](https://github.com/auth0/node-jsonwebtoken#readme)
 
-
-## Author
-
-- [Satrio Bayu](https://github.com/SatrioBayu)
-
-
 ## Dokumentasi API
 
 Dokumentasi API masih dalam pengerjaan. Rencananya dokumentasi API akan menggunakan Swagger
