@@ -5,11 +5,11 @@
 
 JWT Refresh Token Implementation merupakan implementasi pribadi saya sebagai author dalam penggunakan JWT (JSON Web Token). Pada dasarnya, token JWT bisa aktif selamanya. Namun, untuk meningkatkan sekuritas dalam operasi yang terjadi maka token JWT bisa ditentukan masa aktifnya sehingga token JWT akan expired apabila melebihi masa aktifnya. Lalu untuk memperbarui token JWT dibutuhkan Refresh Token yang disimpan pada database setiap kali user melakukan login dan akan dihapus apabila user logout. 
 
-## Cara Kerja
+## Procedure
 
 Terdapat database dengan tabel User yang berisikan beberapa kolom seperti ID (UUID), Username, Password, Refresh Token. User dapat melakukan login yang mana server akan mengembalikan ACCESS_TOKEN dan menyimpan REFRESH_TOKEN pada tabel. ACCESS_TOKEN tersebut bisa digunakan ketika melakukan operasi whoAmI (Terdapat pada bagian API Reference). Namun, ACESS_TOKEN tersebut hanya akan aktif selama 30 menit dan akan expired setelahnya. Untuk *generate* ACCESS_TOKEN, bisa melakukan operasi updateToken (Terdapat pada bagian API Reference). Dalam operasi tersebut dibutuhkan data pada *request body* dengan nama parameter **token** yang berisikan REFRESH_TOKEN. REFRESH_TOKEN ini akan diverifikasi oleh JWT dan apabila valid maka akan mengembalikan respon berisikan ACCESS_TOKEN yang baru.
 
-**Catatan**
+**Notes**
 
 Refresh Token ini hanya digunakan referensi ketika akan melakukan generate access token baru sehingga Refresh Token tidak akan bisa digunakan sebagai Access Token.
 
