@@ -87,8 +87,10 @@ const handleLogin = async (req, res) => {
 
     // Cek user ada atau tidak
     const user = await User.findOne({
-      username: {
-        [Op.iLike]: username,
+      where: {
+        username: {
+          [Op.iLike]: username,
+        },
       },
     });
     if (!user) {
