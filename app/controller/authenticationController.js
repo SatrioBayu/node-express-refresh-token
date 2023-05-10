@@ -9,7 +9,7 @@ const handleAuth = async (req, res, next) => {
     const auth = req.headers.authorization;
     if (!auth) {
       return res.status(401).send({
-        message: "No token provided",
+        message: "Token tidak disediakan",
       });
     }
     const token = auth.split(" ")[1];
@@ -138,7 +138,7 @@ const handleLogout = async (req, res) => {
 
     if (!user)
       return res.status(404).send({
-        message: "User not found",
+        message: "User tidak ditemukan",
       });
 
     await user.update({
