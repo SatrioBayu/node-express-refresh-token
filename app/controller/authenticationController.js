@@ -1,4 +1,5 @@
 const { User } = require("../models");
+const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -42,7 +43,9 @@ const handleRegister = async (req, res) => {
     // Cek username sudah ada atau belum
     const exist = await User.findOne({
       where: {
-        username,
+        username: {
+          [Op.iLike]: username,
+        },
       },
     });
     if (exist) {
@@ -84,8 +87,8 @@ const handleLogin = async (req, res) => {
 
     // Cek user ada atau tidak
     const user = await User.findOne({
-      where: {
-        username,
+      username: {
+        [Op.iLike]: username,
       },
     });
     if (!user) {
@@ -127,7 +130,9 @@ const handleLogout = async (req, res) => {
 
     const user = await User.findOne({
       where: {
-        username,
+        username: {
+          [Op.iLike]: username,
+        },
       },
     });
 
