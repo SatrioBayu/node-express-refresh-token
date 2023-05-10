@@ -1,0 +1,493 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Node Refresh Token",
+    "description": "Dokumentasi API dari project / repository https://github.com/SatrioBayu/node-express-refresh-token yang berisikan demo / implementasi penggunaan JWT Refresh Token",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000"
+    }
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Registrasi",
+        "requestBody": {
+          "description": "Objek kombinasi username dan password",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "Bayu"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": 123456
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/successfullyRegistered"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/errorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/usernameAlreadyRegistered"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login",
+        "requestBody": {
+          "description": "Kombinasi username dan password",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "bayu"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": 123456
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/successfullyLogin"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Username atau password harus terisi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Username atau password salah",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/wrongPasswordOrUsername"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "Authorization"
+        ],
+        "summary": "Mendapatkan informasi user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userSuccessfullyFetched"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/noToken"
+                    },
+                    {
+                      "$ref": "#/components/schemas/invalidToken"
+                    },
+                    {
+                      "$ref": "#/components/schemas/tokenMalformed"
+                    },
+                    {
+                      "$ref": "#/components/schemas/userNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/refresh": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Generate Access Token baru",
+        "requestBody": {
+          "description": "Isi body dengan refresh token yang didapat ketika login",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNjU1ODExNDk1fQ.D91jt8PB9WTYcmU2Mm6rC_5t_J1xCoqboxJHEudlw6k"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/successGenerateToken"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/noToken"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logout and menghapus refresh token dari tabel",
+        "requestBody": {
+          "description": "Isi body dengan data username yang akan logout",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "Jisoo"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Berhasil logout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Berhasil logout"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User tidak ditemukan"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "noToken": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "No token provided"
+          }
+        }
+      },
+      "invalidToken": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "invalid signature"
+          }
+        }
+      },
+      "tokenMalformed": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "jwt malformed"
+          }
+        }
+      },
+      "userNotFound": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Unauthorized"
+          }
+        }
+      },
+      "errorBody": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Username atau Password harus ada"
+          }
+        }
+      },
+      "usernameAlreadyRegistered": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Username telah digunakan"
+          }
+        }
+      },
+      "wrongPasswordOrUsername": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Username atau password salah"
+          }
+        }
+      },
+      "successfullyRegistered": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User berhasil dibuat"
+          }
+        }
+      },
+      "successfullyLogin": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNjU1ODExNDk1fQ.D91jt8PB9WTYcmU2Mm6rC_5t_J1xCoqboxJHEudlw6k"
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5ODM2ZWY4LWNkNGEtNGM0NC05MzliLWFkZjRiYWZhNjQxZSIsImlhdCI6MTY4MzY4NDU3MywiZXhwIjoxNjgzNjg2MzczfQ.nOWW0L6KJiSa01IUA_w_xEFmpWZYhJZiGFnz0x05qZY"
+          }
+        }
+      },
+      "userSuccessfullyFetched": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User berhasil diambil"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "59836ef8-cd4a-4c44-939b-adf4bafa641e"
+              },
+              "username": {
+                "type": "string",
+                "example": "Jisoo"
+              },
+              "password": {
+                "type": "string",
+                "example": "$2a$10$CGm6D9VDgdbyIBPLZWQbOOzPt/2TubunKPTwGw3BXWStTxzJYyLl."
+              },
+              "refreshToken": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5ODM2ZWY4LWNkNGEtNGM0NC05MzliLWFkZjRiYWZhNjQxZSIsImlhdCI6MTY4MzY4NDU3M30.vIsmhAtJQwlFdmSGBKoO01YDgeRQ2OgJxExac7yoKq8"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "serverError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Internal Server Error"
+          }
+        }
+      },
+      "successGenerateToken": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5ODM2ZWY4LWNkNGEtNGM0NC05MzliLWFkZjRiYWZhNjQxZSIsImlhdCI6MTY4MzY4NDU3M30.vIsmhAtJQwlFdmSGBKoO01YDgeRQ2OgJxExac7yoKq8"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
