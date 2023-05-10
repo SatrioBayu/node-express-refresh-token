@@ -93,7 +93,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
+                  "username": {
                     "type": "string",
                     "example": "bayu"
                   },
