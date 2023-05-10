@@ -38,11 +38,14 @@ POST http://localhost:8000/refresh
 ```https
 POST http://localhost:8000/logout
 ```
-**API Docs Live**
+**API Docs**
 ```https
 http://localhost:8000/api-docs/
 ```
-
+**API Docs Live**
+```https
+https://experimental-production-8461.up.railway.app/api-docs
+```
 ## Run Locally
 
 Clone the project
