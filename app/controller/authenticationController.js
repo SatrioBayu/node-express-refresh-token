@@ -26,7 +26,11 @@ const handleAuth = async (req, res, next) => {
     }
     const token = auth.split(" ")[1];
 
-    const invalidToken = await InvalidToken.findOne({ token });
+    const invalidToken = await InvalidToken.findOne({
+      where: {
+        token,
+      },
+    });
     if (invalidToken) return res.status(403).send({ message: "Token is invalid" });
 
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -123,12 +127,25 @@ const handleLogin = async (req, res) => {
       });
     }
 
+    const refreshTokenCookie = req.cookies.refreshToken;
+    if (refreshTokenCookie)
+      return res.status(409).send({
+        message: "Anda sudah melakukan login",
+      });
+
     const accessToken = generateAccessToken(user);
-    let refreshToken;
-    if (user.refreshToken == null) {
-      refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET);
-      await user.update({ refreshToken });
-    }
+
+    const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET);
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 60 * 1000,
+    });
+
+    // let refreshToken;
+    // if (user.refreshToken == null) {
+    //   refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET);
+    //   await user.update({ refreshToken });
+    // }
 
     // res.cookie("accessToken", accessToken, { httpOnly: true });
     // res.cookie("refreshToken", refreshToken, { httpOnly: true });
@@ -137,7 +154,6 @@ const handleLogin = async (req, res) => {
       accessToken,
       // refreshToken,
     });
-    res.sendStatus(200);
   } catch (error) {
     console.log(error.message);
     res.status(500).send({
@@ -152,26 +168,33 @@ const handleLogout = async (req, res) => {
 
     if (!username || !token) return res.status(400).send({ message: "Username atau Token harus ada" });
 
-    const user = await User.findOne({
-      where: {
-        username: {
-          [Op.iLike]: username,
-        },
-      },
-    });
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const userId = decoded.id;
+
+    const user = await User.findByPk(userId);
 
     if (!user)
       return res.status(404).send({
         message: "User tidak ditemukan",
       });
 
+    if (user.username !== username) return res.status(401).send({ message: "Token tidak valid untuk user ini" });
+
     await user.update({
       refreshToken: null,
     });
 
-    await InvalidToken.create({
-      token,
+    const tokenExist = await InvalidToken.findOne({
+      where: {
+        token,
+      },
     });
+
+    if (!tokenExist) {
+      await InvalidToken.create({
+        token,
+      });
+    }
 
     await res.status(200).send({
       message: "Berhasil logout",
@@ -199,22 +222,23 @@ const handleWhoAmI = async (req, res) => {
 
 const handleRefreshToken = async (req, res) => {
   try {
-    const refreshToken = req.body.token;
-    if (refreshToken == null) return res.sendStatus(401);
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken == null)
+      return res.status(401).send({
+        message: "Refresh token tidak ditemukan",
+      });
 
-    // Cek user ada atau tidak
-    const user = await User.findOne({
-      where: {
-        refreshToken,
-      },
-    });
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const user = await User.findByPk(decoded.id);
+    if (!user) {
+      return res.status(404).send({
+        message: "User tidak ditemukan",
+      });
+    }
 
-    if (!user) return res.sendStatus(403);
-
-    jwt.verify(user.refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
-      if (err) return res.sendStatus(403);
-      const accessToken = generateAccessToken(data);
-      res.status(200).send({ accessToken });
+    const accessToken = generateAccessToken(user);
+    res.status(200).send({
+      accessToken,
     });
   } catch (error) {
     res.status(500).send({
