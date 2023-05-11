@@ -1,6 +1,9 @@
 const app = require("../app");
+const { clearInvalidTokenTableJob } = require("../app/cron");
 require("dotenv").config();
 const PORT = process.env.PORT || 8000;
+
+clearInvalidTokenTableJob.start();
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running");

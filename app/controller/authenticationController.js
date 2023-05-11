@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, InvalidToken } = require("../models");
 const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -6,6 +6,18 @@ require("dotenv").config();
 
 const handleAuth = async (req, res, next) => {
   try {
+    // Using Cookies
+    // const accessToken = req.cookies && req.cookies.accessToken ? req.cookies.accessToken : null;
+    // if (!accessToken) return res.status(401).send({ message: "Token tidak tersedia" });
+
+    // const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+    // const user = await User.findByPk(decoded.id);
+
+    // if (!user) return res.status(401).send({ message: "Unauthorized" });
+    // req.user = user;
+    // next();
+
+    // Using Authorization
     const auth = req.headers.authorization;
     if (!auth) {
       return res.status(401).send({
@@ -13,6 +25,10 @@ const handleAuth = async (req, res, next) => {
       });
     }
     const token = auth.split(" ")[1];
+
+    const invalidToken = await InvalidToken.findOne({ token });
+    if (invalidToken) return res.status(403).send({ message: "Token is invalid" });
+
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     const user = await User.findByPk(decodedToken.id);
     if (!user) {
@@ -114,10 +130,14 @@ const handleLogin = async (req, res) => {
       await user.update({ refreshToken });
     }
 
+    // res.cookie("accessToken", accessToken, { httpOnly: true });
+    // res.cookie("refreshToken", refreshToken, { httpOnly: true });
+
     res.status(200).send({
       accessToken,
-      refreshToken,
+      // refreshToken,
     });
+    res.sendStatus(200);
   } catch (error) {
     console.log(error.message);
     res.status(500).send({
@@ -128,7 +148,9 @@ const handleLogin = async (req, res) => {
 
 const handleLogout = async (req, res) => {
   try {
-    const { username } = req.body;
+    const { username, token } = req.body;
+
+    if (!username || !token) return res.status(400).send({ message: "Username atau Token harus ada" });
 
     const user = await User.findOne({
       where: {
@@ -146,7 +168,12 @@ const handleLogout = async (req, res) => {
     await user.update({
       refreshToken: null,
     });
-    res.status(200).send({
+
+    await InvalidToken.create({
+      token,
+    });
+
+    await res.status(200).send({
       message: "Berhasil logout",
     });
   } catch (error) {
