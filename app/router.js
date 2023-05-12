@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const { authenticationController } = require("./controller");
+const bodyValidation = require("./validation/bodyValidation");
+const validationResult = require("./validation/validationResult");
 const swaggerDocument = require("../docs/openapi.json");
 const swaggerUI = require("swagger-ui-express");
 
@@ -17,10 +19,10 @@ router.use("/api-docs/json", (req, res) => {
 router.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 // User
-router.post("/register", authenticationController.handleRegister);
-router.post("/login", authenticationController.handleLogin);
+router.post("/register", bodyValidation.authValidate, validationResult.validate, authenticationController.handleRegister);
+router.post("/login", bodyValidation.authValidate, validationResult.validate, authenticationController.handleLogin);
 router.get("/me", authenticationController.handleAuth, authenticationController.handleWhoAmI);
 router.post("/refresh", authenticationController.handleRefreshToken);
-router.post("/logout", authenticationController.handleLogout);
+router.post("/logout", bodyValidation.logoutValidate, validationResult.validate, authenticationController.handleLogout);
 
 module.exports = router;
