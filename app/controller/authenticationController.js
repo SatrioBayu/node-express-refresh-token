@@ -2,6 +2,9 @@ const { User, InvalidToken } = require("../models");
 const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { noTokenProvided, tokenBlocked, tokenInvalid, unauthorized, usernameOrPasswordWrong, alreadyLogin, userNotFound, tokenNotAuthorized, refreshTokenNotFound } = require("../errors/AuthError");
+const { internalError } = require("../errors/InternalServerError");
+const { usernameAlreadyRegistered } = require("../errors/UsernameError");
 require("dotenv").config();
 
 const handleAuth = async (req, res, next) => {
@@ -20,9 +23,7 @@ const handleAuth = async (req, res, next) => {
     // Using Authorization
     const auth = req.headers.authorization;
     if (!auth) {
-      return res.status(401).send({
-        message: "Token tidak disediakan",
-      });
+      return res.status(401).send(noTokenProvided());
     }
     const token = auth.split(" ")[1];
 
@@ -31,34 +32,26 @@ const handleAuth = async (req, res, next) => {
         token,
       },
     });
-    if (invalidToken) return res.status(403).send({ message: "Token is invalid" });
+    if (invalidToken) return res.status(403).send(tokenBlocked());
 
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    const user = await User.findByPk(decodedToken.id);
-    if (!user) {
-      return res.status(401).send({
-        message: "Unauthorized",
-      });
-    }
-    req.user = user;
-    next();
-  } catch (error) {
-    res.status(500).send({
-      message: error.message,
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
+      if (err) return res.send(tokenInvalid());
+
+      const user = await User.findByPk(decoded.id);
+      if (!user) {
+        return res.status(401).send(unauthorized());
+      }
+      req.user = user;
+      next();
     });
+  } catch (error) {
+    res.status(500).send(internalError(error.message));
   }
 };
 
 const handleRegister = async (req, res) => {
   try {
     const { username, password } = req.body;
-
-    // Cek ada body atau tidak
-    if (!username || !password) {
-      return res.status(400).send({
-        message: "Username atau Password harus ada",
-      });
-    }
 
     // Cek username sudah ada atau belum
     const exist = await User.findOne({
@@ -69,9 +62,7 @@ const handleRegister = async (req, res) => {
       },
     });
     if (exist) {
-      return res.status(400).send({
-        message: "Username telah digunakan",
-      });
+      return res.status(400).send(usernameAlreadyRegistered());
     }
 
     // Enkripsi password
@@ -87,23 +78,13 @@ const handleRegister = async (req, res) => {
       message: "User berhasil dibuat",
     });
   } catch (error) {
-    console.log(error.message);
-    res.status(500).send({
-      message: error.message,
-    });
+    res.status(500).send(internalError(error.message));
   }
 };
 
 const handleLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
-
-    // Cek ada body atau tidak
-    if (!username || !password) {
-      return res.status(400).send({
-        message: "Username atau Password harus ada",
-      });
-    }
 
     // Cek user ada atau tidak
     const user = await User.findOne({
@@ -113,23 +94,14 @@ const handleLogin = async (req, res) => {
         },
       },
     });
-    if (!user)
-      return res.status(404).send({
-        message: "Username atau password salah",
-      });
+    if (!user) return res.status(404).send(usernameOrPasswordWrong());
 
     // Cek password
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid)
-      return res.status(404).send({
-        message: "Username atau password salah",
-      });
+    if (!isPasswordValid) return res.status(404).send(usernameOrPasswordWrong());
 
     const refreshTokenCookie = req.cookies.refreshToken;
-    if (refreshTokenCookie)
-      return res.status(409).send({
-        message: "Anda sudah melakukan login",
-      });
+    if (refreshTokenCookie) return res.status(409).send(alreadyLogin());
 
     const accessToken = generateAccessToken(user);
 
@@ -153,10 +125,7 @@ const handleLogin = async (req, res) => {
       // refreshToken,
     });
   } catch (error) {
-    console.log(error.message);
-    res.status(500).send({
-      message: error.message,
-    });
+    res.status(500).send(internalError(error.message));
   }
 };
 
@@ -164,43 +133,40 @@ const handleLogout = async (req, res) => {
   try {
     const { username, token } = req.body;
 
-    if (!username || !token) return res.status(400).send({ message: "Username atau Token harus ada" });
+    // if (!username || !token) return res.status(400).send({ message: "Username atau Token harus ada" });
 
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    const userId = decoded.id;
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
+      if (err) return res.send(tokenInvalid());
+      const userId = decoded.id;
 
-    const user = await User.findByPk(userId);
+      const user = await User.findByPk(userId);
 
-    if (!user)
-      return res.status(404).send({
-        message: "User tidak ditemukan",
+      if (!user) return res.status(404).send(userNotFound());
+
+      if (user.username !== username) return res.status(401).send(tokenNotAuthorized());
+
+      // await user.update({
+      //   refreshToken: null,
+      // });
+
+      const tokenExist = await InvalidToken.findOne({
+        where: {
+          token,
+        },
       });
 
-    if (user.username !== username) return res.status(401).send({ message: "Token tidak valid untuk user ini" });
+      if (!tokenExist) {
+        await InvalidToken.create({
+          token,
+        });
+      }
 
-    await user.update({
-      refreshToken: null,
-    });
-
-    const tokenExist = await InvalidToken.findOne({
-      where: {
-        token,
-      },
-    });
-
-    if (!tokenExist) {
-      await InvalidToken.create({
-        token,
+      await res.status(200).send({
+        message: "Berhasil logout",
       });
-    }
-
-    await res.status(200).send({
-      message: "Berhasil logout",
     });
   } catch (error) {
-    res.status(500).send({
-      message: error.message,
-    });
+    res.status(500).send(internalError(error.message));
   }
 };
 
@@ -212,36 +178,30 @@ const handleWhoAmI = async (req, res) => {
       data: user,
     });
   } catch (error) {
-    res.status(500).send({
-      message: error.message,
-    });
+    res.status(500).send(internalError(error.message));
   }
 };
 
 const handleRefreshToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
-    if (refreshToken == null)
-      return res.status(401).send({
-        message: "Refresh token tidak ditemukan",
-      });
+    if (refreshToken == null) return res.status(401).send(refreshTokenNotFound());
 
-    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    const user = await User.findByPk(decoded.id);
-    if (!user) {
-      return res.status(404).send({
-        message: "User tidak ditemukan",
-      });
-    }
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
+      if (err) return res.send(tokenInvalid());
 
-    const accessToken = generateAccessToken(user);
-    res.status(200).send({
-      accessToken,
+      const user = await User.findByPk(decoded.id);
+      if (!user) {
+        return res.status(404).send(userNotFound());
+      }
+
+      const accessToken = generateAccessToken(user);
+      res.status(200).send({
+        accessToken,
+      });
     });
   } catch (error) {
-    res.status(500).send({
-      message: error.message,
-    });
+    res.status(500).send(internalError(error.message));
   }
 };
 
