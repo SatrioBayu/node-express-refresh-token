@@ -113,19 +113,17 @@ const handleLogin = async (req, res) => {
         },
       },
     });
-    if (!user) {
+    if (!user)
       return res.status(404).send({
         message: "Username atau password salah",
       });
-    }
 
     // Cek password
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    if (!isPasswordValid)
       return res.status(404).send({
         message: "Username atau password salah",
       });
-    }
 
     const refreshTokenCookie = req.cookies.refreshToken;
     if (refreshTokenCookie)
