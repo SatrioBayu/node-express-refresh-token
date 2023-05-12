@@ -31,7 +31,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: expect.any(String),
+            code: "E-014",
             message: "Username telah digunakan",
           },
         ],
@@ -155,7 +155,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: expect.any(String),
+            code: "E-009",
             message: "Username / Password salah",
           },
         ],
@@ -180,7 +180,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: expect.any(String),
+            code: "E-009",
             message: "Username / Password salah",
           },
         ],
@@ -208,7 +208,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: expect.any(String),
+            code: "E-010",
             message: "Anda sudah melakukan login",
           },
         ],
