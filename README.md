@@ -105,3 +105,7 @@ Atau juga bisa dilakukan set manual pada file config/database.js
 - [Express](http://expressjs.com/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [JWT](https://github.com/auth0/node-jsonwebtoken#readme)
+
+## Unit Test Coverage
+
+![App Screenshot](https://res.cloudinary.com/dgr7ck0sl/image/upload/v1684127860/coverage_edwlys.png)
