@@ -552,7 +552,7 @@ describe("authenticationController", () => {
         ],
       });
     });
-    it("should return 200 if the username and token valid also match each other", async () => {
+    it("should return 200 if the username, token valid and match each other", async () => {
       const token = jwt.sign({ id: "2572b205-1439-420e-9f8f-3958bfda88cf" }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30m" });
 
       const mockReq = {
