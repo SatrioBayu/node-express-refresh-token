@@ -577,6 +577,125 @@ describe("authenticationController", () => {
     });
   });
 
+  describe("handleRefreshToken", () => {
+    it("should return 500 if there's error in catch block", async () => {
+      const mockReq = {};
+
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+      };
+
+      await authenticationController.handleRefreshToken(mockReq, mockRes);
+
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.send).toHaveBeenCalledWith({
+        errors: [
+          {
+            code: "E-013",
+            message: expect.any(String),
+          },
+        ],
+      });
+    });
+    it("should return 401 if there's no refresh token", async () => {
+      const mockReq = {
+        cookies: {},
+      };
+
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+      };
+
+      await authenticationController.handleRefreshToken(mockReq, mockRes);
+
+      expect(mockRes.status).toHaveBeenCalledWith(401);
+      expect(mockRes.send).toHaveBeenCalledWith({
+        errors: [
+          {
+            code: "E-012",
+            message: "Refresh token tidak ditemukan",
+          },
+        ],
+      });
+    });
+    it("should return 401 if the token is invalid", async () => {
+      const refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFmNWMwZjI3LWJhZTktNDJjNC1hMWU0LTBiN2I1MTZmNDBjYyIsImlhdCI6MTY4NDEyNTY4OH0.GK6xqzH0xrHe53dfer4FgxlQmqRQenpjfIamFeOZeKIs";
+
+      const mockReq = {
+        cookies: {
+          refreshToken,
+        },
+      };
+
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+      };
+
+      await authenticationController.handleRefreshToken(mockReq, mockRes);
+
+      expect(mockRes.status).toHaveBeenCalledWith(401);
+      expect(mockRes.send).toHaveBeenCalledWith({
+        errors: [
+          {
+            code: "E-006",
+            message: "Token tidak valid / diubah secara sengaja",
+          },
+        ],
+      });
+    });
+    it("should return 404 if the id inside token didn't match any Users", async () => {
+      const refreshToken = jwt.sign({ id: "8d04658b-cf4e-46df-8d6f-1aa4a85f0c36" }, process.env.REFRESH_TOKEN_SECRET);
+
+      const mockReq = {
+        cookies: {
+          refreshToken,
+        },
+      };
+
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+      };
+
+      authenticationController.handleRefreshToken(mockReq, mockRes, () => {
+        expect(mockRes.status).toHaveBeenCalledWith(404);
+        expect(mockRes.send).toHaveBeenCalledWith({
+          errors: [
+            {
+              code: "E-011",
+              message: "User tidak ditemukan",
+            },
+          ],
+        });
+        done();
+      });
+    });
+    it("should return 200 if everything is valid", async () => {
+      const refreshToken = jwt.sign({ id: "2572b205-1439-420e-9f8f-3958bfda88cf" }, process.env.REFRESH_TOKEN_SECRET);
+
+      const mockReq = {
+        cookies: {
+          refreshToken,
+        },
+      };
+
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+      };
+
+      authenticationController.handleRefreshToken(mockReq, mockRes, () => {
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.status).toHaveBeenCalledWith({
+          accessToken: expect.any(String),
+        });
+      });
+    });
+  });
+
   describe("handleWhoAmI", () => {
     it("should return 500 if there's error in try catch block", async () => {
       const mockReq = {
