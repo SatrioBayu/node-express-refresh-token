@@ -42,8 +42,7 @@ describe("authenticationController", () => {
     it("should return 401 if the token is invalid, malformed or expired", async () => {
       const mockReq = {
         headers: {
-          authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFmNWMwZjI3LWJhZTktNDJjNC1hMWU0LTBiN2I1MTZmNDBjYyIsImlhdCI6MTY4Mzg4MjYzNywiZXhwIjoxNjgzODg0NDM3fQ.sJxtLTu1MLwYEhwuVbJ2CfLYIjSAm5qqwwqX7Wif0xAss",
+          authorization: `Bearer ${process.env.ACCESS_TOKEN_INVALID}`,
         },
       };
 
@@ -95,8 +94,7 @@ describe("authenticationController", () => {
     it("should return 403 if the token is blocked", async () => {
       const mockReq = {
         headers: {
-          authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFmNWMwZjI3LWJhZTktNDJjNC1hMWU0LTBiN2I1MTZmNDBjYyIsImlhdCI6MTY4Mzc4ODA4NCwiZXhwIjoxNjgzNzg5ODg0fQ.VZJ6Fc9cfSsXncW1odYEf6tDsEJkxsr52GSKb4F666M",
+          authorization: `Bearer ${process.env.ACCESS_TOKEN_BLOCKED}`,
         },
       };
 
@@ -455,8 +453,7 @@ describe("authenticationController", () => {
       const mockReq = {
         body: {
           username: "Jisoo",
-          token:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFmNWMwZjI3LWJhZTktNDJjNC1hMWU0LTBiN2I1MTZmNDBjYyIsImlhdCI6MTY4Mzg4MjYzNywiZXhwIjoxNjgzODg0NDM3fQ.sJxtLTu1MLwYEhwuVbJ2CfLYIjSAm5qqwwqX7Wif0xAss",
+          token: `Bearer ${process.env.ACCESS_TOKEN_INVALID}`,
         },
       };
 
@@ -621,11 +618,9 @@ describe("authenticationController", () => {
       });
     });
     it("should return 401 if the token is invalid", async () => {
-      const refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFmNWMwZjI3LWJhZTktNDJjNC1hMWU0LTBiN2I1MTZmNDBjYyIsImlhdCI6MTY4NDEyNTY4OH0.GK6xqzH0xrHe53dfer4FgxlQmqRQenpjfIamFeOZeKIs";
-
       const mockReq = {
         cookies: {
-          refreshToken,
+          refreshToken: process.env.REFRESH_TOKEN_INVALID,
         },
       };
 
