@@ -423,4 +423,51 @@ describe("authenticationController", () => {
       );
     });
   });
+
+  describe("handleWhoAmI", () => {
+    it("should return 500 if there's error in try catch block", async () => {
+      const mockReq = {
+        user: {
+          id: "lalala",
+        },
+      };
+
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+      };
+
+      await authenticationController.handleWhoAmI(mockReq, mockRes);
+
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.send).toHaveBeenCalledWith({
+        errors: [
+          {
+            code: "E-013",
+            message: expect.any(String),
+          },
+        ],
+      });
+    });
+    it("should return 200 if there's no error", async () => {
+      const mockReq = {
+        user: {
+          id: "2572b205-1439-420e-9f8f-3958bfda88cf",
+        },
+      };
+
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+      };
+
+      await authenticationController.handleWhoAmI(mockReq, mockRes);
+
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.send).toHaveBeenCalledWith({
+        message: "User berhasil diambil",
+        data: expect.any(Object),
+      });
+    });
+  });
 });
