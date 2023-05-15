@@ -2,7 +2,7 @@ const usernameAlreadyRegistered = () => {
   return {
     errors: [
       {
-        code: "E-014",
+        code: "E-016",
         message: "Username telah digunakan",
       },
     ],

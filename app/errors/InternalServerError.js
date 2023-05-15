@@ -2,7 +2,7 @@ const internalError = (error) => {
   return {
     errors: [
       {
-        code: "E-013",
+        code: "E-015",
         message: error,
       },
     ],
