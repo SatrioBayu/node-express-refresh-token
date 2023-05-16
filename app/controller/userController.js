@@ -8,10 +8,7 @@ const handleUpdateUsername = async (req, res) => {
     const { username } = req.body;
     const user = await User.findByPk(req.user.id);
     if (!user) return res.status(404).send(authErr.userNotFound());
-    if (username === req.user.username)
-      return res.status(400).send({
-        message: "Username baru tidak boleh sama dengan username sebelumnya",
-      });
+    if (username === user.username) return res.status(400).send(usernameErr.newUsernameSame());
 
     const existingUser = await User.findOne({
       where: {
