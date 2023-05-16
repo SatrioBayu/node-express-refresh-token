@@ -9,6 +9,18 @@ const noFileUploaded = () => {
   };
 };
 
+const onlyImageAllowed = () => {
+  return {
+    errors: [
+      {
+        code: "E-022",
+        message: "Tipe file yang diperbolehkan hanya gambar",
+      },
+    ],
+  };
+};
+
 module.exports = {
   noFileUploaded,
+  onlyImageAllowed,
 };
