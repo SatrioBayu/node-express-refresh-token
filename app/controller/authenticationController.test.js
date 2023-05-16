@@ -33,7 +33,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-004",
+            code: "E-008",
             message: "Token tidak disediakan",
           },
         ],
@@ -59,7 +59,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-006",
+            code: "E-010",
             message: "Token tidak valid / diubah secara sengaja",
           },
         ],
@@ -83,7 +83,7 @@ describe("authenticationController", () => {
         expect(mockRes.send).toHaveBeenCalledWith({
           errors: [
             {
-              code: "E-008",
+              code: "E-012",
               message: "Tidak diotorisasi",
             },
           ],
@@ -111,7 +111,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-005",
+            code: "E-009",
             message: "Token telah diblokir",
           },
         ],
@@ -135,7 +135,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-013",
+            code: "E-018",
             message: expect.any(String),
           },
         ],
@@ -184,7 +184,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-014",
+            code: "E-019",
             message: "Username telah digunakan",
           },
         ],
@@ -234,7 +234,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-013",
+            code: "E-018",
             message: expect.any(String),
           },
         ],
@@ -308,7 +308,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-009",
+            code: "E-013",
             message: "Username / Password salah",
           },
         ],
@@ -333,7 +333,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-009",
+            code: "E-013",
             message: "Username / Password salah",
           },
         ],
@@ -361,7 +361,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-010",
+            code: "E-015",
             message: "Anda sudah melakukan login",
           },
         ],
@@ -385,7 +385,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-013",
+            code: "E-018",
             message: expect.any(String),
           },
         ],
@@ -468,7 +468,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-006",
+            code: "E-010",
             message: "Token tidak valid / diubah secara sengaja",
           },
         ],
@@ -494,7 +494,7 @@ describe("authenticationController", () => {
         expect(mockRes.send).toHaveBeenCalledWith({
           errors: [
             {
-              code: "E-007",
+              code: "E-011",
               message: "Token tidak valid untuk user ini",
             },
           ],
@@ -522,7 +522,7 @@ describe("authenticationController", () => {
         expect(mockRes.send).toHaveBeenCalledWith({
           errors: [
             {
-              code: "E-011",
+              code: "E-016",
               message: "User tidak ditemukan",
             },
           ],
@@ -543,7 +543,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-013",
+            code: "E-018",
             message: expect.any(String),
           },
         ],
@@ -589,7 +589,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-013",
+            code: "E-018",
             message: expect.any(String),
           },
         ],
@@ -611,7 +611,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-012",
+            code: "E-017",
             message: "Refresh token tidak ditemukan",
           },
         ],
@@ -635,7 +635,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-006",
+            code: "E-010",
             message: "Token tidak valid / diubah secara sengaja",
           },
         ],
@@ -660,7 +660,7 @@ describe("authenticationController", () => {
         expect(mockRes.send).toHaveBeenCalledWith({
           errors: [
             {
-              code: "E-011",
+              code: "E-016",
               message: "User tidak ditemukan",
             },
           ],
@@ -710,7 +710,7 @@ describe("authenticationController", () => {
       expect(mockRes.send).toHaveBeenCalledWith({
         errors: [
           {
-            code: "E-013",
+            code: "E-018",
             message: expect.any(String),
           },
         ],

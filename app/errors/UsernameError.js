@@ -2,11 +2,22 @@ const usernameAlreadyRegistered = () => {
   return {
     errors: [
       {
-        code: "E-014",
+        code: "E-019",
         message: "Username telah digunakan",
       },
     ],
   };
 };
 
-module.exports = { usernameAlreadyRegistered };
+const newUsernameSame = () => {
+  return {
+    errors: [
+      {
+        code: "E-020",
+        message: "Username baru tidak boleh sama dengan username sebelumnya",
+      },
+    ],
+  };
+};
+
+module.exports = { usernameAlreadyRegistered, newUsernameSame };
