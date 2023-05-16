@@ -61,6 +61,8 @@ const handleUpdateImage = async (req, res) => {
 
     if (!req.file) return res.status(400).send(uploadErr.noFileUploaded());
 
+    if (!req.file.mimetype.startsWith("image/")) return res.status(400).send(uploadErr.onlyImageAllowed());
+
     const user = await User.findByPk(id);
     if (!user) return res.status(404).send(authErr.userNotFound());
 
