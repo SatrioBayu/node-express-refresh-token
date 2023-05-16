@@ -33,7 +33,7 @@ const handleAuth = async (req, res, next) => {
     if (invalidToken) return res.status(403).send(authErr.tokenBlocked());
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
-      if (err) return res.status(401).send(authErr.tokenInvalid());
+      if (err) return res.status(401).send(authErr.tokenInvalid(err.message));
 
       const user = await User.findByPk(decoded.id);
       if (!user) {
@@ -134,7 +134,7 @@ const handleLogout = async (req, res) => {
     // if (!username || !token) return res.status(400).send({ message: "Username atau Token harus ada" });
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
-      if (err) return res.status(401).send(authErr.tokenInvalid());
+      if (err) return res.status(401).send(authErr.tokenInvalid(err.message));
       const userId = decoded.id;
 
       const user = await User.findByPk(userId);
@@ -186,7 +186,7 @@ const handleRefreshToken = async (req, res) => {
     if (refreshToken == null) return res.status(401).send(authErr.refreshTokenNotFound());
 
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
-      if (err) return res.status(401).send(authErr.tokenInvalid());
+      if (err) return res.status(401).send(authErr.tokenInvalid(err.message));
 
       const user = await User.findByPk(decoded.id);
       if (!user) {
