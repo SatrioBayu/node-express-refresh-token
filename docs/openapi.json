@@ -96,7 +96,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "username": {
+                  "email": {
                     "type": "string",
                     "example": "bayu"
                   },
@@ -136,6 +136,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/wrongPasswordOrUsername"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sudah melakukan login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/alreadyLogin"
                 }
               }
             }
@@ -187,6 +197,15 @@
                     },
                     {
                       "$ref": "#/components/schemas/userNotFound"
+                    },
+                    {
+                      "$ref": "#/components/schemas/tokenBlocked"
+                    },
+                    {
+                      "$ref": "#/components/schemas/tokenNotAuthorized"
+                    },
+                    {
+                      "$ref": "#/components/schemas/unauthorized"
                     }
                   ]
                 }
@@ -250,7 +269,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/noToken"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/noToken"
+                    },
+                    {
+                      "$ref": "#/components/schemas/refreshTokenNotFound"
+                    }
+                  ]
                 }
               }
             }
@@ -316,13 +342,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "User tidak ditemukan"
-                    }
-                  }
+                  "$ref": "#/components/schemas/userNotFound"
                 }
               }
             }
@@ -339,6 +359,264 @@
           }
         }
       }
+    },
+    "/updateUsername": {
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update username",
+        "requestBody": {
+          "description": "Isi dengan username baru",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "Jabran"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Username berhasil diubah",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Username berhasil diubah"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Username baru sama dengan username lama",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/newUsernameSame"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Username telah digunakan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/usernameAlreadyRegistered"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/updatePassword": {
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update password",
+        "requestBody": {
+          "description": "Isi dengan password lama dan password baru",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "oldPassword": {
+                    "type": "string",
+                    "example": 123456
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "example": 654321
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password berhasil diubah",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Password berhasil diubah"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Password lama tidak sesuai",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/oldPasswordIncorrect"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userNotFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/updatePhoto": {
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update photo profile",
+        "requestBody": {
+          "description": "Isi dengan file bertipe gambar",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "photo": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File berhasil diupload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "File berhasil diupload dan diperbarui"
+                    },
+                    "result": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "File upload tidak disediakan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/noFileUploaded"
+                    },
+                    {
+                      "$ref": "#/components/schemas/onlyImageAllowed"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userNotFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -346,42 +624,140 @@
       "noToken": {
         "type": "object",
         "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-008"
+          },
           "message": {
             "type": "string",
-            "example": "No token provided"
+            "example": "Token tidak disediakan"
           }
         }
       },
       "invalidToken": {
         "type": "object",
         "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-010"
+          },
           "message": {
             "type": "string",
-            "example": "invalid signature"
+            "example": "Invalid signature"
           }
         }
       },
       "tokenMalformed": {
         "type": "object",
         "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-010"
+          },
           "message": {
             "type": "string",
-            "example": "jwt malformed"
+            "example": "Jwt malformed"
+          }
+        }
+      },
+      "tokenBlocked": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-009"
+          },
+          "message": {
+            "type": "string",
+            "example": "Token telah diblokir"
+          }
+        }
+      },
+      "tokenNotAuthorized": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-011"
+          },
+          "message": {
+            "type": "string",
+            "example": "Token tidak valid untuk user ini"
+          }
+        }
+      },
+      "unauthorized": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-012"
+          },
+          "message": {
+            "type": "string",
+            "example": "Tidak diotorisasi"
+          }
+        }
+      },
+      "oldPasswordIncorrect": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-014"
+          },
+          "message": {
+            "type": "string",
+            "example": "Password lama yang anda masukkan salah, silahkan coba lagi"
+          }
+        }
+      },
+      "alreadyLogin": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-015"
+          },
+          "message": {
+            "type": "string",
+            "example": "Anda sudah melakukan login"
           }
         }
       },
       "userNotFound": {
         "type": "object",
         "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-016"
+          },
           "message": {
             "type": "string",
-            "example": "Unauthorized"
+            "example": "User tidak ditemukan"
+          }
+        }
+      },
+      "refreshTokenNotFound": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-017"
+          },
+          "message": {
+            "type": "string",
+            "example": "Refresh token tidak ditemukan"
           }
         }
       },
       "errorBody": {
         "type": "object",
         "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-001"
+          },
           "message": {
             "type": "string",
             "example": "Username atau Password harus ada"
@@ -391,15 +767,62 @@
       "usernameAlreadyRegistered": {
         "type": "object",
         "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-019"
+          },
           "message": {
             "type": "string",
             "example": "Username telah digunakan"
           }
         }
       },
+      "newUsernameSame": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-020"
+          },
+          "message": {
+            "type": "string",
+            "example": "Username baru tidak boleh sama dengan username sebelumnya"
+          }
+        }
+      },
+      "noFileUploaded": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-021"
+          },
+          "message": {
+            "type": "string",
+            "example": "File yang akan diupload tidak disediakan"
+          }
+        }
+      },
+      "onlyImageAllowed": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-022"
+          },
+          "message": {
+            "type": "string",
+            "example": "Tipe file yang diperbolehkan hanya gambar"
+          }
+        }
+      },
       "wrongPasswordOrUsername": {
         "type": "object",
         "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-013"
+          },
           "message": {
             "type": "string",
             "example": "Username atau password salah"
@@ -469,6 +892,10 @@
       "serverError": {
         "type": "object",
         "properties": {
+          "code": {
+            "type": "string",
+            "example": "E-018"
+          },
           "message": {
             "type": "string",
             "example": "Internal Server Error"
