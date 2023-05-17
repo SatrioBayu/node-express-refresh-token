@@ -60,7 +60,7 @@ describe("authenticationController", () => {
         errors: [
           {
             code: "E-010",
-            message: "Token tidak valid / diubah secara sengaja",
+            message: expect.any(String),
           },
         ],
       });
@@ -469,7 +469,7 @@ describe("authenticationController", () => {
         errors: [
           {
             code: "E-010",
-            message: "Token tidak valid / diubah secara sengaja",
+            message: expect.any(String),
           },
         ],
       });
@@ -636,7 +636,7 @@ describe("authenticationController", () => {
         errors: [
           {
             code: "E-010",
-            message: "Token tidak valid / diubah secara sengaja",
+            message: expect.any(String),
           },
         ],
       });

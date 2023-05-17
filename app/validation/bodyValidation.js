@@ -75,6 +75,13 @@ const passwordValidator = (fieldName) => {
 
 module.exports = {
   authValidate: [usernameValidator, passwordValidator("password")],
+  loginValidate: [
+    usernameValidator,
+    body("password").notEmpty().withMessage({
+      code: "E-002",
+      message: "Password tidak boleh kosong",
+    }),
+  ],
   updateUsernameValidate: [usernameValidator],
   updatePasswordValidate: [passwordValidator("oldPassword"), passwordValidator("newPassword")],
   logoutValidate: [

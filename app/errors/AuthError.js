@@ -20,12 +20,13 @@ const tokenBlocked = () => {
   };
 };
 
-const tokenInvalid = () => {
+const tokenInvalid = (message) => {
+  const modifiedMessage = message.charAt(0).toUpperCase() + message.slice(1);
   return {
     errors: [
       {
         code: "E-010",
-        message: "Token tidak valid / diubah secara sengaja",
+        message: modifiedMessage,
       },
     ],
   };
